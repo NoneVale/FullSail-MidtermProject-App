@@ -313,19 +313,25 @@ class LoginScreenState extends State<LoginScreen> {
     _disableUsernameError();
     _disablePasswordError();
 
-    String apiUrl = "http://167.114.114.217:8080/users";
-    String queryUrl = apiUrl + "/" + username + ":-:" + password;
+    String apiUrl = "http://167.114.114.217:8080/";
+    String queryUrl = apiUrl + "users/" + username.substring(0, 1) + "/" + username + ":-:" + password;
 
-    var usernameResponse = await http.get(apiUrl + "/username-lookup/" + username);
+    var usernameResponse = await http.get(apiUrl + "username-lookup/" + username);
     if (usernameResponse.statusCode == 200 && usernameResponse.body.isNotEmpty) {
-      print(usernameResponse.body);
       if (usernameResponse.body != "true") {
         _enableUsernameError();
         return false;
+      } else {
+        var passwordResponse = await http.get(queryUrl);
+        if (passwordResponse.statusCode == 200 && passwordResponse.body.isNotEmpty) {
+          // TODO: Implement code to goto the next screen
+          return true;
+        } else if (passwordResponse.statusCode == 500) {
+          _enablePasswordError();
+          return false;
+        }
       }
     }
-
-    _enableUsernameError();
     return false;
   }
 }
