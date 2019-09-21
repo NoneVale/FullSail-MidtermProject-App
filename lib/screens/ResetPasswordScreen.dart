@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
-import 'RegistrationScreen.dart';
-import 'ForgotPasswordScreen.dart';
+import '../user/UserModel.dart';
 
-class LoginScreen extends StatefulWidget {
+// ignore: must_be_immutable
+class ResetPasswordScreen extends StatefulWidget {
+
+  UserModel userModel;
+  ResetPasswordScreen(UserModel userModel) {
+    this.userModel = userModel;
+  }
+
   @override
-  LoginScreenState createState() => new LoginScreenState();
+  ResetPasswordScreenState createState() => new ResetPasswordScreenState(userModel);
 }
 
-class LoginScreenState extends State<LoginScreen> {
+class ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
-  bool _passwordIncorrect = false;
-  bool _usernameIncorrect = false;
-
-  final _passwordController = new TextEditingController();
-  final _usernameController = new TextEditingController();
+  UserModel userModel;
+  ResetPasswordScreenState(UserModel userModel) {
+    this.userModel = userModel;
+  }
 
   bool _isSelected = false;
 
@@ -25,37 +30,13 @@ class LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  void _enableUsernameError() {
-    setState(() {
-      _usernameIncorrect = true;
-    });
-  }
-
-  void _disableUsernameError() {
-    setState(() {
-      _usernameIncorrect = false;
-    });
-  }
-
-  void _enablePasswordError() {
-    setState(() {
-      _passwordIncorrect = true;
-    });
-  }
-
-  void _disablePasswordError() {
-    setState(() {
-      _passwordIncorrect = false;
-    });
-  }
-
   Widget horizontalLine() => Padding(
-    padding: EdgeInsets.symmetric(horizontal: 16.0),
-    child: Container(
-      width: ScreenUtil.getInstance().setWidth(32.0),
-      height: ScreenUtil.getInstance().setHeight(1.0),
-      color: Colors.black26.withOpacity(0.3),
-    )
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
+      child: Container(
+        width: ScreenUtil.getInstance().setWidth(32.0),
+        height: ScreenUtil.getInstance().setHeight(1.0),
+        color: Colors.black26.withOpacity(0.3),
+      )
   );
 
   @override
@@ -72,8 +53,8 @@ class LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.only(top: 20.0),
-                child: Image.asset("assets/images/logo.png")
+                  padding: EdgeInsets.only(top: 20.0),
+                  child: Image.asset("assets/images/logo.png")
               ),
               Expanded(child: Container(),),
               Image.asset("assets/images/backsplash.png")
@@ -88,6 +69,7 @@ class LoginScreenState extends State<LoginScreen> {
                     children: <Widget>[
                       Image.asset(
                         "assets/images/invis.png", width: ScreenUtil.getInstance().setWidth(128), height: ScreenUtil.getInstance().setHeight(128),
+
                       ),
                       Text("",
                           style: TextStyle(
@@ -125,9 +107,7 @@ class LoginScreenState extends State<LoginScreen> {
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
-                              onTap: () {
-                                login(_usernameController.text, _passwordController.text);
-                              },
+                              onTap: () {},
                               child: Center(
                                 child: Text("Login",
                                     style: TextStyle(
@@ -164,7 +144,7 @@ class LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   SizedBox(
-                    height: ScreenUtil.getInstance().setHeight((_passwordIncorrect || _usernameIncorrect) ? 50 : 90),
+                    height: ScreenUtil.getInstance().setHeight(90),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -174,12 +154,7 @@ class LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(fontFamily: "Poppins-Medium"),
                       ),
                       InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => RegistrationScreen()),
-                          );
-                        },
+                        onTap: () {},
                         child: Text("Register",
                             style: TextStyle(
                                 color: Colors.blue,
@@ -199,7 +174,7 @@ class LoginScreenState extends State<LoginScreen> {
   Widget loginForm() {
     return new Container(
       width: double.infinity,
-      height: ScreenUtil.getInstance().setHeight((_usernameIncorrect || _passwordIncorrect) ? 540 : 500),
+      height: ScreenUtil.getInstance().setHeight(500),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.0),
@@ -218,7 +193,7 @@ class LoginScreenState extends State<LoginScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text("Login",
+            Text("Forgot Password",
                 style: TextStyle(
                     fontSize: ScreenUtil.getInstance().setSp(45),
                     fontWeight: FontWeight.bold,
@@ -227,125 +202,22 @@ class LoginScreenState extends State<LoginScreen> {
             SizedBox(
               height: ScreenUtil.getInstance().setHeight(30),
             ),
-            Text("Username",
+            Text("Email",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontFamily: "Poppins-Medium",
                     fontSize: ScreenUtil.getInstance().setSp(26))),
             TextField(
-              controller: _usernameController,
               decoration: InputDecoration(
-                  hintText: "Username",
-                  errorText: _usernameIncorrect ? "Invalid Username" : null,
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 12.0)),
-            ),
-            SizedBox(
-              height: ScreenUtil.getInstance().setHeight(30),
-            ),
-            Text("Password",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "Poppins-Medium",
-                    fontSize: ScreenUtil.getInstance().setSp(26))),
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                  hintText: "Password",
-                  errorText: _passwordIncorrect ? "Invalid Password" : null,
+                  hintText: "Email",
                   hintStyle: TextStyle(color: Colors.grey, fontSize: 12.0)),
             ),
             SizedBox(
               height: ScreenUtil.getInstance().setHeight(40),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    SizedBox(
-                      width: 12.0,
-                    ),
-                    GestureDetector(
-                      onTap: _radio,
-                      child: radioButton(_isSelected),
-                    ),
-                    SizedBox(
-                      width: 8.0,
-                    ),
-                    Text("Remember Me",
-                        style: TextStyle(
-                            fontSize: ScreenUtil.getInstance().setSp(20), fontFamily: "Poppins-Medium", color: Colors.grey))
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
-                        );
-                      },
-                      child: Text("Forgot Password?",
-                          style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: ScreenUtil.getInstance().setSp(20),
-                              fontFamily: "Poppins-Medium")),
-                    ),
-                    SizedBox(
-                      width: 12.0,
-                    )
-                  ],
-                )
-              ],
-            ),
           ],
         ),
       ),
     );
-  }
-
-  Widget radioButton(bool isSelected) => Container(
-    width: 16.0,
-    height: 16.0,
-    padding: EdgeInsets.all(2.0),
-    decoration: BoxDecoration(
-        shape: BoxShape.rectangle,
-        border: Border.all(width: 2.0, color: Colors.grey)),
-    child: isSelected
-        ? Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration:
-      BoxDecoration(shape: BoxShape.rectangle, color: Colors.grey),
-    )
-        : Container(),
-  );
-
-  Future<bool> login(String username, String password) async {
-    _disableUsernameError();
-    _disablePasswordError();
-
-    String apiUrl = "http://167.114.114.217:8080/";
-    String queryUrl = apiUrl + "users/" + username.substring(0, 1) + "/" + username + ":-:" + password;
-
-    var usernameResponse = await http.get(apiUrl + "username-lookup/" + username);
-    if (usernameResponse.statusCode == 200 && usernameResponse.body.isNotEmpty) {
-      if (usernameResponse.body != "true") {
-        _enableUsernameError();
-        return false;
-      } else {
-        var passwordResponse = await http.get(queryUrl);
-        if (passwordResponse.statusCode == 200 && passwordResponse.body.isNotEmpty) {
-          // TODO: Implement code to goto the next screen
-          return true;
-        } else if (passwordResponse.statusCode == 500) {
-          _enablePasswordError();
-          return false;
-        }
-      }
-    }
-    return false;
   }
 }
