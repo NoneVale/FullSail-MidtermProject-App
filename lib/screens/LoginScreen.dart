@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fs_midterm_application/screens/TimelineScreen.dart';
+import 'package:fs_midterm_application/user/UserModel.dart';
 import 'package:http/http.dart' as http;
 import 'RegistrationScreen.dart';
 import 'ForgotPasswordScreen.dart';
+import 'VerifyEmailScreen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -126,7 +131,7 @@ class LoginScreenState extends State<LoginScreen> {
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: () {
-                                login(_usernameController.text, _passwordController.text);
+                                login(context);
                               },
                               child: Center(
                                 child: Text("Login",
@@ -323,14 +328,14 @@ class LoginScreenState extends State<LoginScreen> {
         : Container(),
   );
 
-  Future<bool> login(String username, String password) async {
+  Future<bool> login(BuildContext context) async {
     _disableUsernameError();
     _disablePasswordError();
 
     String apiUrl = "http://167.114.114.217:8080/";
-    String queryUrl = apiUrl + "users/" + username.substring(0, 1) + "/" + username + ":-:" + password;
+    String queryUrl = apiUrl + "users/" + _usernameController.text.substring(0, 1) + "/" + _usernameController.text + ":-:" + _passwordController.text;
 
-    var usernameResponse = await http.get(apiUrl + "username-lookup/" + username);
+    var usernameResponse = await http.get(apiUrl + "username-lookup/" + _usernameController.text);
     if (usernameResponse.statusCode == 200 && usernameResponse.body.isNotEmpty) {
       if (usernameResponse.body != "true") {
         _enableUsernameError();
@@ -338,7 +343,20 @@ class LoginScreenState extends State<LoginScreen> {
       } else {
         var passwordResponse = await http.get(queryUrl);
         if (passwordResponse.statusCode == 200 && passwordResponse.body.isNotEmpty) {
-          // TODO: Implement code to goto the next screen
+          print(passwordResponse.body);
+          var jsonString = json.decode(passwordResponse.body);
+          UserModel userModel = UserModel.fromJson(jsonString);
+          if (userModel.verified) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => TimelineScreen(userModel)),
+            );
+          } else {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => VerifyEmailScreen()),
+            );
+          }
           return true;
         } else if (passwordResponse.statusCode == 500) {
           _enablePasswordError();

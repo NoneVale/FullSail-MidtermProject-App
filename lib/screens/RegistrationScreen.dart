@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fs_midterm_application/screens/RegistrationCompleteScreen.dart';
 import 'package:http/http.dart' as http;
 import "LoginScreen.dart";
 import "../user/UserRegistrationModel.dart";
@@ -25,7 +26,7 @@ class RegistrationScreenState extends State<RegistrationScreen> {
   bool _emailTaken = false;
   bool _acceptPassword = false;
   bool _passwordsMatch = false;
-  bool _acceptTOS = true;
+  bool _acceptTOS = false;
 
   final _usernameController = new TextEditingController();
   final _firstNameController = new TextEditingController();
@@ -186,7 +187,7 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: () {
-                                register();
+                                register(context);
                               },
                               child: Center(
                                 child: Text("Register",
@@ -301,7 +302,8 @@ class RegistrationScreenState extends State<RegistrationScreen> {
           (_lastNameBlank ? 40.0 : 0.0) +
           (_emailBlank ? 40.0 : _emailTaken ? 40.0 : 0.0) +
           (_passwordBlank ? 40.0 : _acceptPassword ? 80.0 : 0.0) +
-          (_confirmPasswordBlank ? 40.0 : _passwordsMatch ? 40.0 : 0.0)),
+          (_confirmPasswordBlank ? 40.0 : _passwordsMatch ? 40.0 : 0.0) +
+          (_acceptTOS ? 40.0 : 0.0)),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.0),
@@ -550,7 +552,7 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                     GestureDetector(
                       onTap: () {
                         _radio();
-                        _toggleAcceptTOS(!_acceptTOS);
+                        checkTOS();
                       },
                       child: radioButton(_isSelected),
                     ),
@@ -573,6 +575,11 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                 ),
               ],
             ),
+            SizedBox(height: ScreenUtil.getInstance().setHeight(_acceptTOS ? 10.0 : 0.0)),
+            (_acceptTOS ? Text("You must accept the Terms & Conditions to continue",
+                style: TextStyle(
+                    fontSize: ScreenUtil.getInstance().setSp(20), fontFamily: "Poppins-Medium", color: const Color(0xffD33232)))
+                : SizedBox(height: ScreenUtil.getInstance().setHeight(0.0),)),
           ],
         ),
       ),
@@ -585,13 +592,13 @@ class RegistrationScreenState extends State<RegistrationScreen> {
     padding: EdgeInsets.all(2.0),
     decoration: BoxDecoration(
         shape: BoxShape.rectangle,
-        border: Border.all(width: 2.0, color: _acceptTOS ? const Color(0xffD33232) : Colors.grey)),
+        border: Border.all(width: 2.0, color: _acceptTOS ? const Color(0xffD33232) : Colors.black54)),
     child: isSelected
         ? Container(
       width: double.infinity,
       height: double.infinity,
       decoration:
-      BoxDecoration(shape: BoxShape.rectangle, color: Colors.grey),
+      BoxDecoration(shape: BoxShape.rectangle, color: Colors.black54),
     )
         : Container(),
   );
@@ -663,16 +670,34 @@ class RegistrationScreenState extends State<RegistrationScreen> {
     }
   }
 
-  Future<void> register() async {
+  void checkTOS() {
+    _toggleAcceptTOS(!_isSelected);
+  }
+
+  Future<void> register(BuildContext context) async {
     checkUsername();
     checkFirstName();
     checkLastName();
     checkEmail();
     checkPassword();
     checkConfirmPassword();
+    checkTOS();
 
-    final registrationForm = UserRegistrationModel(_usernameController.text, _firstNameController.text, _lastNameController.text, _emailController.text, _passwordController.text,
+    if (_usernameBlank || _usernameTaken || _firstNameBlank || _lastNameBlank ||
+        _emailBlank || _emailTaken || _passwordBlank || _acceptPassword ||
+        _confirmPasswordBlank || _passwordsMatch || _acceptTOS) return;
+
+    final registrationForm = UserRegistrationModel(_emailController.text, _firstNameController.text, _lastNameController.text, _usernameController.text, _passwordController.text,
         birthDay, birthMonth, birthYear);
     print(registrationForm.toJson());
+
+    String apiUrl = "http://167.114.114.217:8080/";
+    final response = await http.post(apiUrl + "registrations", body: registrationForm.toJson());
+
+    print(response.body);
+    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => RegistrationCompleteScreen()),
+    );
   }
 }

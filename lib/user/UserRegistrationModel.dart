@@ -5,9 +5,9 @@ class UserRegistrationModel {
   String username;
   String password;
 
-  int birthDay;
-  int birthMonth;
-  int birthYear;
+  String birthDay;
+  String birthMonth;
+  String birthYear;
 
   UserRegistrationModel(String email, String firstName, String lastName, String username, String password,
       int birthDay, int birthMonth, int birthYear) {
@@ -17,9 +17,9 @@ class UserRegistrationModel {
     this.username = username;
     this.password = password;
 
-    this.birthDay = birthDay;
-    this.birthMonth = birthMonth;
-    this.birthYear = birthYear;
+    this.birthDay = birthDay.toString();
+    this.birthMonth = birthMonth.toString();
+    this.birthYear = birthYear.toString();
   }
 
   Map<String, Object> toJson() {

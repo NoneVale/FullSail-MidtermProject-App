@@ -25,6 +25,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   flutter_screenutil: ^0.5.3
   http: ^0.12.0+2
+  timeago: ^2.0.19
 
 dev_dependencies:
   flutter_test:
@@ -50,6 +51,7 @@ flutter:
     - assets/images/backsplash.png
     - assets/images/logo.png
     - assets/images/invis.png
+    - assets/images/default_pfp.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
