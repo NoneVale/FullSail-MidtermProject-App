@@ -4,18 +4,22 @@ class UserModel {
    String username;
    String email;
    String birthday;
+   String userId;
+   String profilePictureUrl;
 
    bool verified;
 
-   UserModel(String username, String email, String birthday, bool verified) {
+   UserModel(String username, String email, String birthday, String userId, String profilePictureUrl, bool verified) {
      this.username = username;
      this.email = email;
      this.birthday = birthday;
+     this.userId = userId;
+     this.profilePictureUrl = profilePictureUrl;
      this.verified = verified;
    }
 
    factory UserModel.fromJson(Map<String, dynamic> parsedJson) {
-     return new UserModel(parsedJson['username'], parsedJson['email'], parsedJson['birthday'], parsedJson['verified']);
+     return new UserModel(parsedJson['username'], parsedJson['email'], parsedJson['birthday'], parsedJson['userId'], parsedJson['profilePictureUrl'], parsedJson['verified']);
    }
 
    Future<UserModel> fromId(String id) async {

@@ -239,6 +239,7 @@ class LoginScreenState extends State<LoginScreen> {
                     fontSize: ScreenUtil.getInstance().setSp(26))),
             TextField(
               controller: _usernameController,
+
               decoration: InputDecoration(
                   hintText: "Username",
                   errorText: _usernameIncorrect ? "Invalid Username" : null,
