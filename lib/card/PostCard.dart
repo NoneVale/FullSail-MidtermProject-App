@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fs_midterm_application/post/PostModel.dart';
 import 'package:fs_midterm_application/user/UserModel.dart';
 import 'package:http/http.dart' as http;
+import 'package:timeago/timeago.dart' as timeago;
 
 class PostCard extends StatefulWidget {
 
@@ -69,6 +70,7 @@ class PostCardState extends State<PostCard> {
   }
 
   Widget postCard() {
+    var since = DateTime.now().subtract(new Duration(milliseconds: postModel.millisSince));
     return new Container(
       width: double.infinity,
       height: ScreenUtil.getInstance().setHeight(200),
@@ -78,12 +80,12 @@ class PostCardState extends State<PostCard> {
           boxShadow: [
             BoxShadow(
                 color: Colors.black12,
-                offset: Offset(0.0, 15.0),
-                blurRadius: 15.0),
+                offset: Offset(0.0, 8.0),
+                blurRadius: 8.0),
             BoxShadow(
                 color: Colors.black12,
-                offset: Offset(0.0, -10.0),
-                blurRadius: 10.0),
+                offset: Offset(0.0, -5.0),
+                blurRadius: 5.0),
           ]),
       child: Padding(
         padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
@@ -96,39 +98,55 @@ class PostCardState extends State<PostCard> {
                   child: Row(
                     children: <Widget>[
                       Container(
-                        width: 35.0,
-                        height: 35.0,
+                        width: 32.0,
+                        height: 32.0,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
                             fit: BoxFit.cover,
-                            //image: new NetworkImage('https://i.imgur.com/p2POb9F.jpg')
                             image: new NetworkImage('https://i.imgur.com/eFp3FH1.png')
                           )
                         ),
                       ),
-                      SizedBox(width: ScreenUtil.getInstance().setWidth(10)),
+                      SizedBox(width: ScreenUtil.getInstance().setWidth(24)),
                       Text(author.username,
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontFamily: "Poppins-Medium",
-                              fontSize: ScreenUtil.getInstance().setSp(30),
+                              fontSize: ScreenUtil.getInstance().setSp(32),
                           letterSpacing: 0.2)
                       ),
+                      SizedBox(width: ScreenUtil.getInstance().setHeight(36.0)),
+                      Text(timeago.format(since),
+                          style: TextStyle(
+                              fontFamily: "Poppins-Medium",
+                              fontSize: ScreenUtil.getInstance().setSp(20.0),
+                              color: Colors.black54
+                          ),
+                      ),
                     ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: ScreenUtil.getInstance().setHeight(16),
+            ),
+            Row(
+              children: <Widget>[
+                SizedBox(
+                  width: ScreenUtil.getInstance().setWidth(16.0),
+                ),
+                Text(
+                  postModel.body,
+                  maxLines: null,
+                  style: TextStyle(
+                      fontFamily: "Poppins-Medium",
+                      fontSize: ScreenUtil.getInstance().setSp(24)
                   ),
                 )
               ],
             ),
-            SizedBox(
-              height: ScreenUtil.getInstance().setHeight(15),
-            ),
-            Text(postModel.body,
-                maxLines: null,
-                style: TextStyle(
-                  //fontWeight: FontWeight.bold,
-                    fontFamily: "Poppins-Medium",
-                    fontSize: ScreenUtil.getInstance().setSp(24))),
             SizedBox(
               height: ScreenUtil.getInstance().setHeight(40),
             ),

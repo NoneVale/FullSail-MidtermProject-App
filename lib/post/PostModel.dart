@@ -4,17 +4,18 @@ import 'package:fs_midterm_application/user/UserModel.dart';
 class PostModel {
   String body;
   int postTime;
+  int millisSince;
   String author;
   List<CommentModel> comments;
 
-  PostModel(String body, int postTime, String author) {
+  PostModel(String body, int millisSince, String author) {
     this.body = body;
-    this.postTime = postTime;
+    this.millisSince = millisSince;
     this.author = author;
   }
 
   factory PostModel.fromJson(Map<String, dynamic> parsedJson) {
     return new PostModel(
-        parsedJson['body'], parsedJson['postTime'], parsedJson['author']);
+        parsedJson['body'], parsedJson['millisSince'], parsedJson['author']);
   }
 }

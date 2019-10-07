@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -5,6 +6,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fs_midterm_application/card/PostCard.dart';
 import 'package:fs_midterm_application/post/PostModel.dart';
 import 'package:fs_midterm_application/post/PostRegistrationModel.dart';
+import 'package:fs_midterm_application/screens/NotificationsScreen.dart';
+import 'package:fs_midterm_application/screens/SearchScreen.dart';
+import 'package:fs_midterm_application/screens/UserCardScreen.dart';
 import 'package:fs_midterm_application/user/UserModel.dart';
 import 'package:http/http.dart' as http;
 
@@ -45,7 +49,7 @@ class TimelineScreenState extends State<TimelineScreen> {
   Widget horizontalLine() => Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.0),
       child: Container(
-        width: ScreenUtil.getInstance().setWidth(32.0),
+        width: double.infinity,
         height: ScreenUtil.getInstance().setHeight(1.0),
         color: Colors.black26.withOpacity(0.3),
       )
@@ -78,19 +82,53 @@ class TimelineScreenState extends State<TimelineScreen> {
               Image.asset("assets/images/backsplash.png")
             ],
           ),
-          Padding(
-            padding: EdgeInsets.only(left: 28.0, right: 28.0, top: 40.0),
-            child: Column(
-              children: <Widget>[
-                postForm(),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 28, right: 28, top: ScreenUtil.getInstance().setHeight(420.0 + 40.0 + (lines * 40))),
-            child: timelineList(context),
-          )
+          timeLinePage(),
         ],
+      ),
+      bottomNavigationBar: new BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+              title: Text("Home")
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+              title: Text("Search")
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications),
+              title: Text("Notifications")
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_box),
+              title: Text("Profile")
+          ),
+        ],
+        currentIndex: 0,
+        selectedItemColor: Colors.blueAccent,
+        onTap: (index) {
+          switch (index) {
+            case 1:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SearchScreen(userModel)),
+              );
+              break;
+            case 2:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NotificationsScreen(userModel)),
+              );
+              break;
+            case 3:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserCardScreen(userModel, userModel)),
+              );
+              break;
+          }
+        },
       ),
     );
   }
@@ -101,6 +139,7 @@ class TimelineScreenState extends State<TimelineScreen> {
     if (postListResponse.statusCode == 200 && postListResponse.body.isNotEmpty) {
       List<dynamic> jsonList = json.decode(postListResponse.body);
       for (dynamic dyn in jsonList) {
+        print(dyn.toString());
         PostModel post = PostModel.fromJson(dyn);
         this.posts.add(post);
       }
@@ -116,6 +155,56 @@ class TimelineScreenState extends State<TimelineScreen> {
             new PostCard(posts[index]),
             SizedBox(height: ScreenUtil.getInstance().setHeight(20.0),)
           ],
+        );
+      },
+    );
+  }
+
+  ListView timeLinePage() {
+    return ListView.separated(
+      addAutomaticKeepAlives: false,
+      itemCount: posts.length + 1,
+      separatorBuilder: (_, index) {
+        if (index == 0)
+          return new Padding(
+            padding: EdgeInsets.only(left: 28.0, right: 28.0),
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                    height: ScreenUtil.getInstance().setHeight(10.0)
+                ),
+                postForm(),
+                SizedBox(
+                    height: ScreenUtil.getInstance().setHeight(20.0)
+                ),
+                horizontalLine(),
+                SizedBox(
+                    height: ScreenUtil.getInstance().setHeight(20.0)
+                )
+              ],
+            )
+          );
+
+        return new SizedBox(height: ScreenUtil.getInstance().setHeight(0.0));
+      },
+      itemBuilder: (_, index) {
+        if (index == 0)
+          return new SizedBox(height: ScreenUtil.getInstance().setHeight(0.0));
+
+        return new Padding(
+            padding: EdgeInsets.only(left: 28.0, right: 28.0),
+            child: Column(
+              children: <Widget>[
+                new PostCard(posts[index - 1]),
+                SizedBox(
+                    height: ScreenUtil.getInstance().setHeight(20.0)
+                ),
+                horizontalLine(),
+                SizedBox(
+                    height: ScreenUtil.getInstance().setHeight(20.0)
+                ),
+              ],
+            )
         );
       },
     );
@@ -147,12 +236,12 @@ class TimelineScreenState extends State<TimelineScreen> {
           boxShadow: [
             BoxShadow(
                 color: Colors.black12,
-                offset: Offset(0.0, 15.0),
-                blurRadius: 15.0),
+                offset: Offset(0.0, 8.0),
+                blurRadius: 8.0),
             BoxShadow(
                 color: Colors.black12,
-                offset: Offset(0.0, -10.0),
-                blurRadius: 10.0),
+                offset: Offset(0.0, -5.0),
+                blurRadius: 5.0),
           ]),
       child: Padding(
         padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
@@ -175,7 +264,7 @@ class TimelineScreenState extends State<TimelineScreen> {
                             )
                         ),
                       ),
-                      SizedBox(width: ScreenUtil.getInstance().setWidth(16)),
+                      SizedBox(width: ScreenUtil.getInstance().setWidth(24)),
                       Text("Post",
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -242,7 +331,7 @@ class TimelineScreenState extends State<TimelineScreen> {
                   )
                 ],
               ),
-            ),-
+            ),
           ],
         ),
       ),
