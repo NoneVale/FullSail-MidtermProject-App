@@ -607,13 +607,11 @@ class RegistrationScreenState extends State<RegistrationScreen> {
     _toggleUsernameBlank(_usernameController.text.isEmpty);
     if (_usernameController.text.isEmpty) return;
 
-    String apiUrl = "http://167.114.114.217:8080/";
-
-    var usernameResponse = await http.get(
-        apiUrl + "username-lookup/" + _usernameController.text);
-    if (usernameResponse.statusCode == 200 &&
-        usernameResponse.body.isNotEmpty) {
-      if (usernameResponse.body == "true") {
+    String apiUrl = "http://167.114.114.217:8080/api/users/username-lookup/" + _usernameController.text;
+    var response = await http.get(apiUrl);
+    if (response.statusCode == 200 &&
+        response.body.isNotEmpty) {
+      if (response.body == "true") {
         _toggleUsernameTaken(true);
       } else {
         _toggleUsernameTaken(false);
@@ -633,13 +631,12 @@ class RegistrationScreenState extends State<RegistrationScreen> {
     _toggleEmailBlank(_emailController.text.isEmpty);
     if (_emailController.text.isEmpty) return;
 
-    String apiUrl = "http://167.114.114.217:8080/";
+    String apiUrl = "http://167.114.114.217:8080/api/users/email-lookup/" + _usernameController.text;
 
-    var usernameResponse = await http.get(
-        apiUrl + "email-lookup/" + _emailController.text);
-    if (usernameResponse.statusCode == 200 &&
-        usernameResponse.body.isNotEmpty) {
-      if (usernameResponse.body == "true") {
+    var response = await http.get(apiUrl);
+    if (response.statusCode == 200 &&
+        response.body.isNotEmpty) {
+      if (response.body == "true") {
         _toggleEmailTaken(true);
       } else {
         _toggleEmailTaken(false);
@@ -689,15 +686,16 @@ class RegistrationScreenState extends State<RegistrationScreen> {
 
     final registrationForm = UserRegistrationModel(_emailController.text, _firstNameController.text, _lastNameController.text, _usernameController.text, _passwordController.text,
         birthDay, birthMonth, birthYear);
-    print(registrationForm.toJson());
 
-    String apiUrl = "http://167.114.114.217:8080/";
-    final response = await http.post(apiUrl + "registrations", body: registrationForm.toJson());
 
-    print(response.body);
-    Navigator.push(
+    String apiUrl = "http://167.114.114.217:8080/api/users/register";
+    final response = await http.post(apiUrl, body: registrationForm.toJson());
+
+    if (response.statusCode == 200) {
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => RegistrationCompleteScreen()),
-    );
+      );
+    }
   }
 }

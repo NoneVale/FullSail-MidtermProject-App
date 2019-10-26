@@ -1,14 +1,5 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fs_midterm_application/card/NoPostsCard.dart';
-import 'package:fs_midterm_application/card/PostCard.dart';
-import 'package:fs_midterm_application/card/UserCard.dart';
-import 'package:fs_midterm_application/post/PostModel.dart';
-import 'package:fs_midterm_application/post/PostRegistrationModel.dart';
 import 'package:fs_midterm_application/screens/SearchScreen.dart';
 import 'package:fs_midterm_application/screens/TimelineScreen.dart';
 import 'package:fs_midterm_application/screens/UserCardScreen.dart';
@@ -35,7 +26,6 @@ class NotificationsScreenState extends State<NotificationsScreen> {
     this.userModel = userModel;
   }
 
-
   Widget horizontalLine() => Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.0),
       child: Container(
@@ -53,6 +43,18 @@ class NotificationsScreenState extends State<NotificationsScreen> {
     return new Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomPadding: true,
+      appBar: new AppBar(
+        automaticallyImplyLeading: false,
+        iconTheme: IconThemeData(
+          color: Color(0xFF29323c), //change your color here
+        ),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: Image.asset(
+          'assets/images/text5.png',
+          height: 36.0,
+        ),
+      ),
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[

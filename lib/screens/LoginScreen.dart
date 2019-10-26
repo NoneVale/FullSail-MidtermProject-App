@@ -126,7 +126,8 @@ class LoginScreenState extends State<LoginScreen> {
                                     color: Color(0xFF6078ea).withOpacity(.3),
                                     offset: Offset(0.0, 8.0),
                                     blurRadius: 8.0)
-                              ]),
+                              ]
+                          ),
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
@@ -333,18 +334,18 @@ class LoginScreenState extends State<LoginScreen> {
     _disableUsernameError();
     _disablePasswordError();
 
-    String apiUrl = "http://167.114.114.217:8080/";
-    String queryUrl = apiUrl + "users/" + _usernameController.text.substring(0, 1) + "/" + _usernameController.text + ":-:" + _passwordController.text;
 
-    var usernameResponse = await http.get(apiUrl + "username-lookup/" + _usernameController.text);
+    String apiUrl = "http://167.114.114.217:8080/api/users/username-lookup/" + _usernameController.text;
+
+    var usernameResponse = await http.get(apiUrl);
     if (usernameResponse.statusCode == 200 && usernameResponse.body.isNotEmpty) {
       if (usernameResponse.body != "true") {
         _enableUsernameError();
         return false;
       } else {
-        var passwordResponse = await http.get(queryUrl);
+        apiUrl = "http://167.114.114.217:8080/api/users/" + _usernameController.text.substring(0, 1) + "/" + _usernameController.text + ":-:" + _passwordController.text;
+        var passwordResponse = await http.get(apiUrl);
         if (passwordResponse.statusCode == 200 && passwordResponse.body.isNotEmpty) {
-          print(passwordResponse.body);
           var jsonString = json.decode(passwordResponse.body);
           UserModel userModel = UserModel.fromJson(jsonString);
           if (userModel.verified) {

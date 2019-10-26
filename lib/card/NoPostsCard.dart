@@ -1,11 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fs_midterm_application/post/PostModel.dart';
-import 'package:fs_midterm_application/user/UserModel.dart';
-import 'package:http/http.dart' as http;
-import 'package:timeago/timeago.dart' as timeago;
 
 class NoPostsCard extends StatefulWidget {
 
@@ -33,7 +27,6 @@ class NoPostsCardState extends State<NoPostsCard> {
   Widget postCard() {
     return new Container(
       width: double.infinity,
-      height: ScreenUtil.getInstance().setHeight(200),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.0),
@@ -48,7 +41,7 @@ class NoPostsCardState extends State<NoPostsCard> {
                 blurRadius: 5.0),
           ]),
       child: Padding(
-        padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+        padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

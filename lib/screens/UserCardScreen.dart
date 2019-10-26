@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,7 +6,6 @@ import 'package:fs_midterm_application/card/NoPostsCard.dart';
 import 'package:fs_midterm_application/card/PostCard.dart';
 import 'package:fs_midterm_application/card/UserCard.dart';
 import 'package:fs_midterm_application/post/PostModel.dart';
-import 'package:fs_midterm_application/post/PostRegistrationModel.dart';
 import 'package:fs_midterm_application/screens/NotificationsScreen.dart';
 import 'package:fs_midterm_application/screens/SearchScreen.dart';
 import 'package:fs_midterm_application/screens/TimelineScreen.dart';
@@ -31,6 +29,7 @@ class UserCardScreen extends StatefulWidget {
 class UserCardScreenState extends State<UserCardScreen> {
 
   var _result;
+  var _result2;
 
   UserModel targetUser;
   UserModel viewer;
@@ -44,6 +43,12 @@ class UserCardScreenState extends State<UserCardScreen> {
 
   @override
   void initState() {
+    targetUser.update().then((_result) {
+      setState(() {
+        _result2 = "done";
+      });
+    });
+
     getPosts().then((result) {
       setState(() {
         _result = "done";
@@ -66,13 +71,25 @@ class UserCardScreenState extends State<UserCardScreen> {
     ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     ScreenUtil.instance = ScreenUtil(width: 720, height: 1280, allowFontScaling: true);
 
-    if (_result == null) {
+    if (_result == null || _result2 == null) {
       return new Container();
     }
 
     return new Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomPadding: true,
+      appBar: new AppBar(
+        automaticallyImplyLeading: !(targetUser.userId == viewer.userId),
+        iconTheme: IconThemeData(
+          color: Color(0xFF29323c), //change your color here
+        ),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: Image.asset(
+          'assets/images/text5.png',
+          height: 36.0,
+        ),
+      ),
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
@@ -139,15 +156,13 @@ class UserCardScreenState extends State<UserCardScreen> {
   }
 
   Future<void> getPosts() async {
-    String apiUrl = "http://167.114.114.217:8080/";
-    var postListResponse = await http.get(apiUrl + "userposts/" + targetUser.userId);
-    if (postListResponse.statusCode == 200 && postListResponse.body.isNotEmpty) {
-      List<dynamic> jsonList = json.decode(postListResponse.body);
+    String apiUrl = "http://167.114.114.217:8080/api/posts/user/" + targetUser.userId;
+    var response = await http.get(apiUrl);
+    if (response.statusCode == 200 && response.body.isNotEmpty) {
+      List<dynamic> jsonList = json.decode(response.body);
       for (dynamic dyn in jsonList) {
-        print(dyn.toString());
         PostModel post = PostModel.fromJson(dyn);
         this.posts.add(post);
-        print(posts.length);
       }
     }
   }
@@ -158,7 +173,7 @@ class UserCardScreenState extends State<UserCardScreen> {
       itemBuilder: (_, index) {
         return new Column(
           children: <Widget>[
-            new PostCard(posts[index]),
+            new PostCard(posts[index], viewer),
             SizedBox(height: ScreenUtil.getInstance().setHeight(20.0),)
           ],
         );
@@ -196,27 +211,20 @@ class UserCardScreenState extends State<UserCardScreen> {
         },
         itemBuilder: (_, index) {
           if (index == 0)
-            return new SizedBox(height: ScreenUtil.getInstance().setHeight(0.0));
+            return new SizedBox(
+                height: ScreenUtil.getInstance().setHeight(0.0));
 
           return new Padding(
               padding: EdgeInsets.only(left: 28.0, right: 28.0),
               child: Column(
                 children: <Widget>[
                   new NoPostsCard(),
-                  SizedBox(
-                      height: ScreenUtil.getInstance().setHeight(20.0)
-                  ),
-                  horizontalLine(),
-                  SizedBox(
-                      height: ScreenUtil.getInstance().setHeight(20.0)
-                  ),
                 ],
               )
           );
         },
       );
     } else {
-
       return ListView.separated(
         addAutomaticKeepAlives: false,
         itemCount: posts.length + 1,
@@ -231,13 +239,6 @@ class UserCardScreenState extends State<UserCardScreen> {
                         height: ScreenUtil.getInstance().setHeight(10.0)
                     ),
                     new UserCard(targetUser, viewer, posts),
-                    SizedBox(
-                        height: ScreenUtil.getInstance().setHeight(20.0)
-                    ),
-                    horizontalLine(),
-                    SizedBox(
-                        height: ScreenUtil.getInstance().setHeight(20.0)
-                    )
                   ],
                 )
             );
@@ -246,13 +247,13 @@ class UserCardScreenState extends State<UserCardScreen> {
         },
         itemBuilder: (_, index) {
           if (index == 0)
-            return new SizedBox(height: ScreenUtil.getInstance().setHeight(0.0));
+            return new SizedBox(
+                height: ScreenUtil.getInstance().setHeight(0.0));
 
           return new Padding(
               padding: EdgeInsets.only(left: 28.0, right: 28.0),
               child: Column(
                 children: <Widget>[
-                  new PostCard(posts[index - 1]),
                   SizedBox(
                       height: ScreenUtil.getInstance().setHeight(20.0)
                   ),
@@ -260,6 +261,14 @@ class UserCardScreenState extends State<UserCardScreen> {
                   SizedBox(
                       height: ScreenUtil.getInstance().setHeight(20.0)
                   ),
+                  new PostCard(posts[index - 1], viewer),
+                  (index == posts.length ?
+                  SizedBox(
+                      height: ScreenUtil.getInstance().setHeight(20.0)
+                  ) :
+                  SizedBox(
+                      height: ScreenUtil.getInstance().setHeight(0.0)
+                  ))
                 ],
               )
           );
