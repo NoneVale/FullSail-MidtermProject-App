@@ -9,16 +9,6 @@ class NoCommentsCard extends StatefulWidget {
 
 class NoCommentsCardState extends State<NoCommentsCard> {
 
-  Widget horizontalLine() => Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.0),
-      child: Container(
-        width: ScreenUtil.getInstance().setWidth(32.0),
-        height: ScreenUtil.getInstance().setHeight(1.0),
-        color: Colors.black26.withOpacity(0.3),
-      )
-  );
-
-
   @override
   Widget build(BuildContext context) {
     return postCard();
@@ -39,7 +29,8 @@ class NoCommentsCardState extends State<NoCommentsCard> {
                 color: Colors.black12,
                 offset: Offset(0.0, -5.0),
                 blurRadius: 5.0),
-          ]),
+          ]
+      ),
       child: Padding(
         padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 16.0),
         child: Column(

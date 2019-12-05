@@ -142,7 +142,6 @@ class RegistrationCompleteScreenState extends State<RegistrationCompleteScreen> 
   Widget registrationCompleteForm() {
     return new Container(
       width: double.infinity,
-      height: ScreenUtil.getInstance().setHeight(350),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.0),

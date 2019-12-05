@@ -205,7 +205,6 @@ class LoginScreenState extends State<LoginScreen> {
   Widget loginForm() {
     return new Container(
       width: double.infinity,
-      height: ScreenUtil.getInstance().setHeight((_usernameIncorrect || _passwordIncorrect) ? 540 : 500),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.0),
@@ -306,6 +305,9 @@ class LoginScreenState extends State<LoginScreen> {
                   ],
                 )
               ],
+            ),
+            SizedBox(
+              height: ScreenUtil.getInstance().setHeight(40),
             ),
           ],
         ),

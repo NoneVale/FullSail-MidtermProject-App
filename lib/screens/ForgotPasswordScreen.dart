@@ -161,7 +161,6 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget loginForm() {
     return new Container(
       width: double.infinity,
-      height: ScreenUtil.getInstance().setHeight(500),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.0),

@@ -30,7 +30,7 @@ class UserCardState extends State<UserCard> {
   UserModel userModel, viewer;
   List<PostModel> posts;
 
-  var code;
+  var code = 0;
 
   UserCardState(UserModel userModel, UserModel viewer, List<PostModel> posts) {
     this.userModel = userModel;
@@ -72,7 +72,7 @@ class UserCardState extends State<UserCard> {
     var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
     var length = await imageFile.length();
 
-    String apiUrl = "https://i.nonevale.me/up.php?secret=noneValeFileUploader431";
+    String apiUrl = "http://167.114.114.217:8080/api/files/upload";
     var uri = Uri.parse(apiUrl);
 
     var request = new http.MultipartRequest("POST", uri);
@@ -81,10 +81,22 @@ class UserCardState extends State<UserCard> {
 
     request.files.add(multipartFile);
     var response = await request.send();
-    print(response.statusCode);
-    response.stream.transform(utf8.decoder).listen((value) {
-      print(value);
-    });
+
+    if (response.statusCode == 200) {
+      response.stream.transform(utf8.decoder).listen((value) async {
+        apiUrl = "http://167.114.114.217:8080/api/users/profilePicture";
+        print(apiUrl);
+        var response2 = await http.post(apiUrl, body: { "userId": userModel.userId, "url": value });
+        print(response2.statusCode);
+        if (response2.statusCode == 200) {
+          userModel.update().then((result) {
+            setState(() {
+              code++;
+            });
+          });
+        }
+      });
+    }
   }
 
   Widget userCard(BuildContext context) {
@@ -297,7 +309,7 @@ class UserCardState extends State<UserCard> {
     final response = await http.post(apiUrl, body: { "userId": viewer.userId });
     follow.update().then((result) {
       setState(() {
-        code = 1;
+        code++;
       });
     });
   }

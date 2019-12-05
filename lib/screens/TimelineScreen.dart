@@ -1,5 +1,9 @@
-import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
+import 'package:async/async.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as prefix0;
@@ -30,6 +34,10 @@ class TimelineScreenState extends State<TimelineScreen> {
 
   var _result;
 
+  bool _pickImage = false;
+
+  var _image = null;
+
   UserModel userModel;
   List<PostModel> posts;
 
@@ -59,7 +67,6 @@ class TimelineScreenState extends State<TimelineScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //loadPosts();
     ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     ScreenUtil.instance = ScreenUtil(width: 720, height: 1280, allowFontScaling: true);
 
@@ -96,7 +103,24 @@ class TimelineScreenState extends State<TimelineScreen> {
               Image.asset("assets/images/backsplash.png")
             ],
           ),
-          timeLinePage(),
+          timeLinePage(context),
+          _pickImage ?
+              Container(
+                color: Colors.black45.withOpacity(0.7),
+              ) :
+              Container(
+                width: 0,
+                height: 0,
+              ),
+          _pickImage ?
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              Spacer(),
+              imagePickerCard(),
+            ],
+          ) : Container(width: 0, height: 0
+          ),
         ],
       ),
       bottomNavigationBar: new BottomNavigationBar(
@@ -173,7 +197,7 @@ class TimelineScreenState extends State<TimelineScreen> {
     );
   }
 
-  ListView timeLinePage() {
+  ListView timeLinePage(BuildContext context) {
     if (posts.length == 0) {
       return ListView.separated(
         addAutomaticKeepAlives: false,
@@ -188,7 +212,7 @@ class TimelineScreenState extends State<TimelineScreen> {
                         height: ScreenUtil.getInstance().setHeight(10.0)
                     ),
                     //postForm(),
-                    postForm(),
+                    postForm(context),
                     SizedBox(
                         height: ScreenUtil.getInstance().setHeight(20.0)
                     ),
@@ -230,7 +254,7 @@ class TimelineScreenState extends State<TimelineScreen> {
                     SizedBox(
                         height: ScreenUtil.getInstance().setHeight(10.0)
                     ),
-                    postForm(),
+                    postForm(context),
                   ],
                 )
             );
@@ -280,7 +304,21 @@ class TimelineScreenState extends State<TimelineScreen> {
     });
   }
 
-  Widget postForm() {
+  // ignore: missing_return
+  Future<void> getGalleryImage()  {
+    setState(() async {
+      _image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    });
+  }
+
+  // ignore: missing_return
+  Future<void> getCameraImage() {
+    setState(() async {
+      _image = await ImagePicker.pickImage(source: ImageSource.camera);
+    });
+  }
+
+  Widget postForm(BuildContext context) {
     return new Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -327,6 +365,40 @@ class TimelineScreenState extends State<TimelineScreen> {
                             letterSpacing: 0.1)
                     ),
                     Spacer(),
+                    InkWell(
+                      child: Container(
+                        width: ScreenUtil.getInstance().setWidth(48),
+                        height: ScreenUtil.getInstance().setHeight(48),
+                        decoration: BoxDecoration(
+                            gradient: LinearGradient(colors: [
+                              Color(0xFF29323c),
+                              Color(0xFF485563),
+                            ]),
+                            borderRadius: BorderRadius.circular(6.0),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Color(0xFF6078ea).withOpacity(.3),
+                                  offset: Offset(0.0, 8.0),
+                                  blurRadius: 8.0)
+                            ]),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _pickImage = true;
+                              });
+                            },
+                            child: Center(
+                              child: Icon(Icons.image, color: Colors.white,),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ScreenUtil.getInstance().setWidth(16.0),
+                    ),
                     InkWell(
                       child: Container(
                         width: ScreenUtil.getInstance().setWidth(126),
@@ -385,12 +457,224 @@ class TimelineScreenState extends State<TimelineScreen> {
                     ),
                   ),
                 SizedBox(
+                  height: ScreenUtil.getInstance().setHeight(_image != null ? 16.0 : 0),
+                ),
+                _image != null ? Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    photo(),
+                  ],
+                ) : Container( width: 0, height: 0),
+                SizedBox(
                   height: ScreenUtil.getInstance().setHeight(40),
                 ),
               ],
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget photo() {
+
+    return Stack(
+      children: <Widget>[
+        Container(
+          width: 80.0,
+          height: 80.0,
+          decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              image: DecorationImage(
+                  fit: BoxFit.fitHeight,
+                  image: FileImage(_image)
+              )
+          ),
+        ),
+        Align(
+          alignment: Alignment.topRight,
+          child: InkWell(
+            child: Container(
+              width: 16,
+              height: 16,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    Color(0xFF29323c),
+                    Color(0xFF485563),
+                  ]),
+                  borderRadius: BorderRadius.circular(6.0),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color(0xFF6078ea).withOpacity(.3),
+                        offset: Offset(0.0, 8.0),
+                        blurRadius: 8.0)
+                  ]),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      _pickImage = true;
+                    });
+                  },
+                  child: Center(
+                    child: Icon(Icons.cancel, color: Colors.white, size: 16,),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget imagePickerCard() {
+    return new Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8.0),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black12,
+                offset: Offset(0.0, 8.0),
+                blurRadius: 8.0),
+            BoxShadow(
+                color: Colors.black12,
+                offset: Offset(0.0, -5.0),
+                blurRadius: 5.0),
+          ]
+      ),
+      child: Column(
+        children: <Widget>[
+          InkWell(
+            child: Container(
+              height: ScreenUtil.getInstance().setHeight(80),
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    Colors.white,
+                    Colors.white
+                  ]),
+                  borderRadius: BorderRadius.circular(6.0),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color(0xFF6078ea).withOpacity(.3),
+                        offset: Offset(0.0, 8.0),
+                        blurRadius: 8.0)
+                  ]),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    getGalleryImage();
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(Icons.collections, color: Color(0xFF29323c)),
+                      SizedBox(
+                        width: ScreenUtil.getInstance().setWidth(16.0),
+                      ),
+                      Text("Photo Gallery",
+                          style: TextStyle(
+                            color: Color(0xFF29323c),
+                            fontFamily: "Poppins-Bold",
+                            fontSize: ScreenUtil.getInstance().setSp(28.0),
+                          )
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          horizontalLine(),
+          InkWell(
+            child: Container(
+              height: ScreenUtil.getInstance().setHeight(80),
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    Colors.white,
+                    Colors.white
+                  ]),
+                  borderRadius: BorderRadius.circular(6.0),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color(0xFF6078ea).withOpacity(.3),
+                        offset: Offset(0.0, 8.0),
+                        blurRadius: 8.0)
+                  ]),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    getCameraImage();
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(Icons.camera_alt, color: Color(0xFF29323c)),
+                      SizedBox(
+                        width: ScreenUtil.getInstance().setWidth(16.0),
+                      ),
+                      Text("Camera",
+                          style: TextStyle(
+                            color: Color(0xFF29323c),
+                            fontFamily: "Poppins-Bold",
+                            fontSize: ScreenUtil.getInstance().setSp(28.0),
+                          )
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          horizontalLine(),
+          InkWell(
+            child: Container(
+              height: ScreenUtil.getInstance().setHeight(80),
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    Colors.white,
+                    Colors.white
+                  ]),
+                  borderRadius: BorderRadius.circular(6.0),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color(0xFF6078ea).withOpacity(.3),
+                        offset: Offset(0.0, 8.0),
+                        blurRadius: 8.0)
+                  ]),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      _pickImage = false;
+                    });
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text("Cancel",
+                          style: TextStyle(
+                            color: Color(0xFF29323c),
+                            fontFamily: "Poppins-Bold",
+                            fontSize: ScreenUtil.getInstance().setSp(28.0),
+                          )
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -403,16 +687,70 @@ class TimelineScreenState extends State<TimelineScreen> {
     checkIsBlank();
     if (_isBlank) return;
 
-    final postForm = new PostRegistrationModel(_statusController.text, userModel);
+
     String apiUrl = "http://167.114.114.217:8080/api/posts/register";
-    final response = await http.post(apiUrl, body: postForm.toJson());
+    var postForm = new PostRegistrationModel(_statusController.text, userModel, "");
+    if (_image != null) {
+      var stream = new http.ByteStream(DelegatingStream.typed(_image.openRead()));
+      var length = await _image.length();
+
+      apiUrl = "http://167.114.114.217:8080/api/files/upload";
+      var uri = Uri.parse(apiUrl);
+
+      var request = new http.MultipartRequest("POST", uri);
+      var multipartFile = new http.MultipartFile('file', stream, length,
+          filename: basename(_image.path));
+
+      request.files.add(multipartFile);
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        response.stream.transform(utf8.decoder).listen((value) async {
+          postForm = new PostRegistrationModel(_statusController.text, userModel, value);
+
+          apiUrl = "http://167.114.114.217:8080/api/posts/register";
+          final resp = await http.post(apiUrl, body: postForm.toJson());
+          print(resp.statusCode);
+          if (resp.statusCode == 200) {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => TimelineScreen(userModel)),
+            );
+          }
+        });
+      }
+    } else {
+      final response = await http.post(apiUrl, body: postForm.toJson());
+      if (response.statusCode == 200) {
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => TimelineScreen(userModel)),
+        );
+      }
+    }
+  }
+
+  Future<String> uploadImage(File imageFile) async {
+    var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    var length = await imageFile.length();
+
+    String apiUrl = "http://167.114.114.217:8080/api/files/upload";
+    var uri = Uri.parse(apiUrl);
+
+    var request = new http.MultipartRequest("POST", uri);
+    var multipartFile = new http.MultipartFile('file', stream, length,
+        filename: basename(imageFile.path));
+
+    request.files.add(multipartFile);
+    var response = await request.send();
 
     if (response.statusCode == 200) {
-      prefix0.Navigator.pop(context);
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => TimelineScreen(userModel)),
-      );
+      response.stream.transform(utf8.decoder).listen((value) async {
+        return value;
+      });
     }
+    return "";
   }
 }

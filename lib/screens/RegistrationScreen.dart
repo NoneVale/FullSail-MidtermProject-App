@@ -296,14 +296,6 @@ class RegistrationScreenState extends State<RegistrationScreen> {
   Widget loginForm() {
     return new Container(
       width: double.infinity,
-      height: ScreenUtil.getInstance().setHeight(1210.0 +
-          (_usernameBlank ? 40.0 : _usernameTaken ? 40.0 : 0.0) +
-          (_firstNameBlank ? 40.0 : 0.0) +
-          (_lastNameBlank ? 40.0 : 0.0) +
-          (_emailBlank ? 40.0 : _emailTaken ? 40.0 : 0.0) +
-          (_passwordBlank ? 40.0 : _acceptPassword ? 80.0 : 0.0) +
-          (_confirmPasswordBlank ? 40.0 : _passwordsMatch ? 40.0 : 0.0) +
-          (_acceptTOS ? 40.0 : 0.0)),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.0),
@@ -580,6 +572,9 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                 style: TextStyle(
                     fontSize: ScreenUtil.getInstance().setSp(20), fontFamily: "Poppins-Medium", color: const Color(0xffD33232)))
                 : SizedBox(height: ScreenUtil.getInstance().setHeight(0.0),)),
+            SizedBox(
+              height: ScreenUtil.getInstance().setHeight(40),
+            ),
           ],
         ),
       ),
